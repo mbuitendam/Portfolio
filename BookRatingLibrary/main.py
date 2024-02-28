@@ -32,21 +32,20 @@ with app.app_context():
     db.create_all()
 
 
-
 @app.route('/', methods=["GET","POST"])
 def home():
     result = db.session.execute(db.select(Book).order_by(Book.title))
     all_books = result.scalars()
     return render_template("index.html", books = all_books.all())
 
-
+## Add books
 @app.route("/add", methods=["GET","POST"])
 def add():
     if request.method == "POST":
         new_book = Book(
-            title=request.form["Title"],
-            author=request.form["Author"],
-            rating=request.form["Rating"]
+            title = request.form["Title"],
+            author = request.form["Author"],
+            rating = request.form["Rating"]
         )
         db.session.add(new_book)
         db.session.commit()
@@ -54,4 +53,28 @@ def add():
 
     return render_template("add.html")
 
+## Update books
+@app.route("/edit", methods=["GET", "POST"])
+def edit():
+    if request.method == "POST":
+        # updating records
+        book_id = request.form["id"]
+        book_to_update = db.get_or_404(Book, book_id)
+        book_to_update.rating = request.form["rating"]
+        db.session.commit()
+        return redirect(url_for("home"))
 
+    book_id = request.args.get('id')
+    book_selected = db.get_or_404(Book, book_id)
+    return render_template("edit.html", book=book_selected)
+
+## Delete books
+@app.route("/delete")
+def delete():
+    book_id = request.args.get('id')
+
+    # delete record by ID
+    book_to_delete = db.get_or_404(Book, book_id)
+    db.session.delete(book_to_delete)
+    db.session.commit()
+    return redirect(url_for("home"))
