@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}What's first?{% endblock %}
+
+{% block content %}
+
+<a href="{{ url_for('logout')  }}"><button>Logout</button></a>
+
+<a href="{{ url_for('add_item')  }}"><button>New Item</button></a>
+
+
+{% for post in all_posts %}
+    <div>
+        {{ post.title }}
+        {{ post.subheading }}
+        {{ post.author.name }}
+    </div>
+    <br>
+{% endfor %}
+
+{% endblock %}
